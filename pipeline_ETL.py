@@ -32,8 +32,11 @@ class ConnectivityETL:
         
         # Corregir nombre de columna
         if 'cobertuta_4g' in df.columns:
-            df.rename(columns={"cobertuta_4g": "cobertura_4g"}, inplace=True)
+            df.rename(columns={"cobertuta_4g": "cobertura_4g"}, inplace=True) 
         
+        if 'año' in df.columns:
+            df.rename(columns={"año": "ano"}, inplace=True)
+
         # Convertir columnas de texto a string
         text_cols = ['proveedor', 'departamento', 'municipio', 'centro_poblado']
         for col in text_cols:
@@ -72,10 +75,13 @@ class ConnectivityETL:
         
         # Eliminar columnas innecesarias
         cols_to_drop = ['COD_DEPARTAMENTO', 'COD_MUNICIPIO', 'SEGMENTO']
-        df.drop(columns=cols_to_drop, inplace=True)
+        df.drop(columns=cols_to_drop, inplace=True) 
         
         # Limpiar nombres de columnas
-        df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+        df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_") 
+        
+        if 'año' in df.columns:
+            df.rename(columns={"año": "ano"}, inplace=True)
         
         # Convertir columnas de texto a string
         text_cols = ['proveedor', 'departamento', 'municipio', 'tecnologia']
@@ -123,7 +129,7 @@ class ConnectivityETL:
         
         # Agrupar cobertura móvil
         cobertura_grouped = df_cobertura.groupby(
-            ['año', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
+            ['ano', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
             as_index=False
         ).agg({
             'centro_poblado': lambda x: ', '.join(sorted(set(x.dropna()))),
@@ -139,7 +145,7 @@ class ConnectivityETL:
         
         # Agrupar accesos
         accesos_grouped = df_accesos.groupby(
-            ['año', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
+            ['ano', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
             as_index=False
         ).agg({
             'tecnologia': lambda x: ', '.join(sorted(set(x.dropna()))),
@@ -154,7 +160,7 @@ class ConnectivityETL:
         df_final = pd.merge(
             cobertura_grouped, 
             accesos_grouped, 
-            on=['año', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
+            on=['ano', 'trimestre', 'departamento', 'municipio', 'proveedor'], 
             how='inner'
         )
         
